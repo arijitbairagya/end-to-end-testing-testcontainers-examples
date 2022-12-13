@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.testcontainers.consumer.DataConsumerServiceTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.354 s - in com.example.testcontainers.consumer.DataConsumerServiceTest

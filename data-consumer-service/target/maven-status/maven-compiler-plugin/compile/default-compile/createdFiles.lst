@@ -1,0 +1,5 @@
+com/example/testcontainers/consumer/dao/entity/Employee.class
+com/example/testcontainers/consumer/dao/EmployeeRepository.class
+com/example/testcontainers/consumer/DataConsumerService.class
+com/example/testcontainers/consumer/dao/entity/Employee$EmployeeBuilder.class
+com/example/testcontainers/consumer/controller/EmployeeController.class

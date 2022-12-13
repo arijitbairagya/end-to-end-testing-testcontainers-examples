@@ -1,0 +1,11 @@
+testContext:
+  systemUnderTest:
+    pipelineImages:
+      -
+        imageName: test1
+        applicationProperty: app-source-adtp.yml
+      -
+        imageName: Test2
+        applicationProperty: app-consumer-adtp.yml
+
+postgresImage: postgres
