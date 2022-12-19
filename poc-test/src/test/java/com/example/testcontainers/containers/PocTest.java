@@ -15,7 +15,6 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest(classes = PocTest.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableConfigurationProperties(value = TestContext.class)
-@TestPropertySource("classpath:application.yml")
 public class PocTest {
 
     @Autowired

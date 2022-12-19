@@ -5,12 +5,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-@Configuration
+//@Configuration
 @ConfigurationProperties(prefix = "test-context")
 @Data
 @ToString
+@Component
 public class TestContext {
 
     public SystemUnderTest systemUnderTest;

@@ -3,9 +3,18 @@ spring:
     url: ${DATABASE_URL}
     username: ${DATABASE_USER}
     password:  ${DATABASE_PASSWORD}
+  kafka:
+    bootstrap-servers:
+      - ${BOOTSTRAP_SERVER:9092}
 
   jpa:
     generate-ddl: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  kafka:
+    consumer:
+      topic: "consumer-topic"
+      group: "12e1242142142we2"

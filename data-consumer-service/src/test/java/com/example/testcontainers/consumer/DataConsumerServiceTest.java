@@ -1,6 +1,7 @@
 package com.example.testcontainers.consumer;
 
 import com.example.testcontainers.consumer.DataConsumerService;
+import com.example.testcontainers.consumer.config.kafka.KafkaProducer;
 import com.example.testcontainers.consumer.dao.EmployeeRepository;
 import com.example.testcontainers.consumer.dao.entity.Employee;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.Optional;
 
@@ -21,8 +26,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = DataConsumerService.class)
 class DataConsumerServiceTest {
 
+	/*************** Application context loading - START *****************/
 	@Autowired
 	EmployeeRepository employeeRepository;
+
+	@Autowired
+	KafkaProducer kafkaProducer;
+
+	/*************** Application context loading - END *****************/
+
+	/************** Test Containers Setup - START ***************/
+	private static Network network = Network.newNetwork();
 
 	/**
 	 *
@@ -35,16 +49,33 @@ class DataConsumerServiceTest {
 			.withUsername("admin")
 			.withPassword("admin")
 			.withDatabaseName("poc_docker_container")
+			.withNetwork(network)
+			.withNetworkAliases("postgres")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres"))
 			.withReuse(true); // reuse is used to keep the containers alive even after the test execution to
 
+	private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
+			.withNetwork(network)
+			.withNetworkAliases("kafka")
+			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka"))
+			.withReuse(true);
+
+	/************** Test Containers Setup - END ***************/
+
 	@BeforeAll
 	public static void setupContainers() {
+
+//		Startables.deepStart(postgreSQLContainer, kafkaContainer).join();
 		postgreSQLContainer.start();
 
 		System.setProperty("DATABASE_URL", postgreSQLContainer.getJdbcUrl());
 		System.setProperty("DATABASE_USER", postgreSQLContainer.getUsername());
 		System.setProperty("DATABASE_PASSWORD", postgreSQLContainer.getJdbcUrl());
+
+		// add kafka properties
+		log.debug("Starting kafka container..");
+		kafkaContainer.start();
+		System.setProperty("BOOTSTRAP_SERVER", kafkaContainer.getBootstrapServers());
 	}
 
 	/**
@@ -57,6 +88,8 @@ class DataConsumerServiceTest {
 		dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
 		dynamicPropertyRegistry.add("spring.datasource.user", postgreSQLContainer::getUsername);
 		dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+
+		dynamicPropertyRegistry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
 	}
 
 	@Test
@@ -73,6 +106,17 @@ class DataConsumerServiceTest {
 		Optional<Employee> empRes = employeeRepository.findById(savedEmp.getId());
 
 		assertThat(empRes).contains(Employee.builder().name(savedEmp.getName()).id(savedEmp.getId()).build());
+	}
+
+	@Test
+	void testKafkaIntegration() {
+
+		Employee newEmp = Employee.builder()
+				.name("Arijit Bairagya ..via kafka")
+				.build();
+
+		kafkaProducer.sendMessage(newEmp.toString());
+
 	}
 
 }

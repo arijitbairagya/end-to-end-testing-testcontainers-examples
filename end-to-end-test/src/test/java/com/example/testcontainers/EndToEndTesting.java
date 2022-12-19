@@ -1,5 +1,6 @@
 package com.example.testcontainers;
 
+import com.example.testcontainers.containers.CustomKafkaContainer;
 import com.example.testcontainers.containers.CustomPostgreSQLContainer;
 import com.example.testcontainers.containers.DataConsumerServiceContainer;
 import com.example.testcontainers.properties.TestContext;
@@ -43,17 +44,21 @@ public class EndToEndTesting {
 
     private Network end2endNetwork = Network.newNetwork();
 
-    private PostgreSQLContainer postgreSQLContainer;
+    private CustomPostgreSQLContainer postgreSQLContainer;
+
+    private CustomKafkaContainer kafkaContainer;
 
 
     @BeforeAll
     public void initContainers() {
         log.debug("Starting all the containers..." );
+        postgreSQLContainer = CustomPostgreSQLContainer.getInstance();
+        postgreSQLContainer.initialize(end2endNetwork);
+        postgreSQLContainer.start(); // can be started together with Kafka by join TODO
 
-        initPostgresContainer();
-        log.debug("Starting postgreSQLContainer..." );
-        postgreSQLContainer.start();
-
+        kafkaContainer = CustomKafkaContainer.getInstance();
+        kafkaContainer.initialize(end2endNetwork);
+        kafkaContainer.start(); // Can be started together
 
         initDataConsumerService();
 
@@ -65,6 +70,7 @@ public class EndToEndTesting {
         dataConsumerServiceContainer
                 .withNetwork(end2endNetwork)
                 .dependsOn(postgreSQLContainer)
+                .dependsOn(kafkaContainer)
                 .withEnv(
                         Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
                                 "DATABASE_USER", postgreSQLContainer.getUsername(),
@@ -77,18 +83,6 @@ public class EndToEndTesting {
         log.debug("Data Consumer Service started...");
     }
 
-    private void initPostgresContainer() {
-        log.debug("initPostgresContainer..." );
-        postgreSQLContainer = CustomPostgreSQLContainer.getInstance();
-        postgreSQLContainer.withUsername("super-admin")
-                .withPassword("super-admin")
-                .withExposedPorts(5432)
-                .withReuse(true)
-                .withNetwork(end2endNetwork)
-                .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("PostgreSQL"))
-                .waitingFor(Wait.forLogMessage(".*to accept connections.*\\n", 1));
-
-    }
 
     @Test
     public void testDataPersist() {
