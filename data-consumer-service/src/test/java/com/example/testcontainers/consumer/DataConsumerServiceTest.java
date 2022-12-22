@@ -52,29 +52,26 @@ class DataConsumerServiceTest {
 			.withNetwork(network)
 			.withNetworkAliases("postgres")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres"))
-			.withReuse(true); // reuse is used to keep the containers alive even after the test execution to
+			.withReuse(false); // reuse is used to keep the containers alive even after the test execution to
 
 	private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
 			.withNetwork(network)
 			.withNetworkAliases("kafka")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka"))
-			.withReuse(true);
+			.withReuse(false);
 
 	/************** Test Containers Setup - END ***************/
 
 	@BeforeAll
 	public static void setupContainers() {
 
-//		Startables.deepStart(postgreSQLContainer, kafkaContainer).join();
-		postgreSQLContainer.start();
+		Startables.deepStart(postgreSQLContainer, kafkaContainer).join();
 
 		System.setProperty("DATABASE_URL", postgreSQLContainer.getJdbcUrl());
 		System.setProperty("DATABASE_USER", postgreSQLContainer.getUsername());
 		System.setProperty("DATABASE_PASSWORD", postgreSQLContainer.getJdbcUrl());
 
 		// add kafka properties
-		log.debug("Starting kafka container..");
-		kafkaContainer.start();
 		System.setProperty("BOOTSTRAP_SERVER", kafkaContainer.getBootstrapServers());
 	}
 
@@ -115,8 +112,9 @@ class DataConsumerServiceTest {
 				.name("Arijit Bairagya ..via kafka")
 				.build();
 
-		kafkaProducer.sendMessage(newEmp.toString());
+		log.debug("Sending message to kafka..{} ", newEmp);
 
+		kafkaProducer.sendMessage(newEmp.toString(), "consumer-topic");
 	}
 
 }

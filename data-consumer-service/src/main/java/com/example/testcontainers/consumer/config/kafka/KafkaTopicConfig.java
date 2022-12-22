@@ -12,8 +12,8 @@ import java.util.Map;
 
 @Configuration
 public class KafkaTopicConfig {
-    
-    @Value(value = "${spring.kafka.bootstrap-servers}")
+
+    @Value(value = "${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapAddress;
 
     @Bean
@@ -22,9 +22,9 @@ public class KafkaTopicConfig {
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         return new KafkaAdmin(configs);
     }
-    
+
     @Bean
     public NewTopic topic1() {
-         return new NewTopic("data-consume-topic", 1, (short) 1);
+         return new NewTopic("consumer-topic", 1, (short) 1);
     }
 }

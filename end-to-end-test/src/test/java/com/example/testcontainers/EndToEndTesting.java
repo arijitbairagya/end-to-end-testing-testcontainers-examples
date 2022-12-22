@@ -74,7 +74,8 @@ public class EndToEndTesting {
                 .withEnv(
                         Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
                                 "DATABASE_USER", postgreSQLContainer.getUsername(),
-                                "DATABASE_PASSWORD", postgreSQLContainer.getPassword()))
+                                "DATABASE_PASSWORD", postgreSQLContainer.getPassword(),
+                                "BOOTSTRAP_SERVER", kafkaContainer.getBootstrapServers()))
                 .withExposedPorts(8081)
                 .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("ConsumerService"))
                 .waitingFor(Wait.forLogMessage(".*Started DataConsumerService.*\\n", 1));
@@ -86,7 +87,9 @@ public class EndToEndTesting {
 
     @Test
     public void testDataPersist() {
+
         log.debug("nothing 111>>>>> {} ", postgreSQLContainer.getJdbcUrl());
+        log.debug("kafka bootstrap address:: {}",kafkaContainer.getBootstrapServers());
     }
 
     @Test

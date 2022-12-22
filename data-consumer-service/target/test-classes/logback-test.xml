@@ -13,5 +13,6 @@
         <appender-ref ref="CONSOLE" />
     </root>
     <logger name="com.example.testcontainers" level="DEBUG"/>
+    <logger name="com.testcontainers" level="INFO"/>
     <logger name="org.springframework" level="INFO"/>
 </configuration>

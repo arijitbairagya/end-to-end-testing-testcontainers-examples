@@ -1,5 +1,10 @@
+com/example/testcontainers/consumer/config/kafka/KafkaProducer.class
 com/example/testcontainers/consumer/dao/entity/Employee.class
+com/example/testcontainers/consumer/config/kafka/KafkaConsumer.class
 com/example/testcontainers/consumer/dao/EmployeeRepository.class
 com/example/testcontainers/consumer/DataConsumerService.class
 com/example/testcontainers/consumer/dao/entity/Employee$EmployeeBuilder.class
+com/example/testcontainers/consumer/config/kafka/KafkaConsumerConfig.class
 com/example/testcontainers/consumer/controller/EmployeeController.class
+com/example/testcontainers/consumer/config/kafka/KafkaTopicConfig.class
+com/example/testcontainers/consumer/config/kafka/KafkaProducerConfig.class

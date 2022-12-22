@@ -4,8 +4,18 @@ spring:
     username: ${DATABASE_USER}
     password:  ${DATABASE_PASSWORD}
   kafka:
-    bootstrap-servers:
-      - ${BOOTSTRAP_SERVER:9092}
+    consumer:
+      bootstrap-servers: ${BOOTSTRAP_SERVER}
+      group: "unique-group-123"
+      topic: "consumer-topic"
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    producer:
+      bootstrap-servers: ${BOOTSTRAP_SERVER}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   jpa:
     generate-ddl: true
@@ -13,8 +23,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-app:
-  kafka:
-    consumer:
-      topic: "consumer-topic"
-      group: "12e1242142142we2"
+
+logging:
+  level:
+    com.example.testcontainers : "DEBUG"

@@ -17,10 +17,10 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfig {
 
-    @Value(value = "${spring.kafka.bootstrap-servers}")
+    @Value(value = "${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapAddress;
 
-    @Value(value = "${app.kafka.consumer.group}")
+    @Value(value = "${spring.kafka.consumer.group}")
     private String groupId;
 
     @Bean
@@ -31,7 +31,7 @@ public class KafkaConsumerConfig {
           bootstrapAddress);
         props.put(
           ConsumerConfig.GROUP_ID_CONFIG, 
-          groupId);
+          "unique-group-123");
         props.put(
           ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, 
           StringDeserializer.class);
