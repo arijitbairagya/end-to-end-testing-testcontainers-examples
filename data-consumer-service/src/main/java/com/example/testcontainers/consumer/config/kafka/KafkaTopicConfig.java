@@ -24,7 +24,12 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic topic1() {
+    public NewTopic consumerTopicIn() {
          return new NewTopic("consumer-topic", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic consumerTopicOut() {
+        return new NewTopic("consumer-topic-out", 1, (short) 1);
     }
 }

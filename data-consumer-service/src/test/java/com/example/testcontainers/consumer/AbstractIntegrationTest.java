@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName;
 public class AbstractIntegrationTest {
 
     /** This is the docker network **/
-//    public static Network dockerNetwork = Network.newNetwork();
+    public static Network dockerNetwork = Network.newNetwork();
 
 
     /**
@@ -31,7 +31,7 @@ public class AbstractIntegrationTest {
             .withUsername("admin")
             .withPassword("admin")
             .withDatabaseName("poc_docker_container")
-//            .withNetwork(dockerNetwork)
+            .withNetwork(dockerNetwork)
             .withNetworkAliases("postgres")
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres-Test-Container"))
             .withReuse(false); // reuse is used to keep the containers alive even after the test execution to
@@ -45,9 +45,11 @@ public class AbstractIntegrationTest {
      *
      */
     public static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
-//            .withNetwork(dockerNetwork)
+            .withNetwork(dockerNetwork)
+            .withAccessToHost(true)
             .withNetworkAliases("kafka")
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka-Test-Container"))
+            .withExposedPorts(9092, 9093)
             .withReuse(false);
 
 
@@ -66,20 +68,5 @@ public class AbstractIntegrationTest {
         log.debug("kafka port::{} ", kafkaContainer.getFirstMappedPort());
         System.setProperty("BOOTSTRAP_SERVER", kafkaContainer.getBootstrapServers());
     }
-
-//    /**
-//     * Dynamic properties will be set to actual application context if we load the application context instead of loading
-//     * docker image
-//     *
-//     * @param dynamicPropertyRegistry
-//     */
-//    @DynamicPropertySource
-//    public static void overrideProperty(DynamicPropertyRegistry dynamicPropertyRegistry) {
-//        dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-//        dynamicPropertyRegistry.add("spring.datasource.user", postgreSQLContainer::getUsername);
-//        dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-//
-//        dynamicPropertyRegistry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
-//    }
 
 }

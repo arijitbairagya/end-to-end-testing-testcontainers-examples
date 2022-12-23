@@ -101,7 +101,7 @@ class DataConsumerServiceTest {
 	}
 
 	@Test
-	void testInsertedData() {
+	void testInsertedDataToPostgres() {
 		Employee savedEmp = employeeRepository.save(Employee.builder()
 				.name("Bairagya")
 				.build());
@@ -136,10 +136,7 @@ class DataConsumerServiceTest {
 				log.debug("Got record:: {}", rec.value());
 				Assert.assertEquals("ABCDEF", rec.value());
 			});
-
 		});
-
-
 	}
 
 	private KafkaConsumer<String, String> getConsumer(
