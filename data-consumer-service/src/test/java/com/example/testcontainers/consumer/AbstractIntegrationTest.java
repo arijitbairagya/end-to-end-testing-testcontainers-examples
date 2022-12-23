@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName;
 public class AbstractIntegrationTest {
 
     /** This is the docker network **/
-    public static Network dockerNetwork = Network.newNetwork();
+//    public static Network dockerNetwork = Network.newNetwork();
 
 
     /**
@@ -31,7 +31,7 @@ public class AbstractIntegrationTest {
             .withUsername("admin")
             .withPassword("admin")
             .withDatabaseName("poc_docker_container")
-            .withNetwork(dockerNetwork)
+//            .withNetwork(dockerNetwork)
             .withNetworkAliases("postgres")
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres-Test-Container"))
             .withReuse(false); // reuse is used to keep the containers alive even after the test execution to
@@ -45,7 +45,7 @@ public class AbstractIntegrationTest {
      *
      */
     public static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
-            .withNetwork(dockerNetwork)
+//            .withNetwork(dockerNetwork)
             .withNetworkAliases("kafka")
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka-Test-Container"))
             .withReuse(false);

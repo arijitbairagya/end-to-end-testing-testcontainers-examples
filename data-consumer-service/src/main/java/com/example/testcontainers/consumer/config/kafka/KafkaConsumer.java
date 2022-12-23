@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class KafkaConsumer {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    KafkaProducer kafkaProducer;
 
 
     private CountDownLatch latch = new CountDownLatch(1);
@@ -29,7 +29,8 @@ public class KafkaConsumer {
     public void receive(String message) {
 
         log.debug("received payload='{}'",message);
-//        employeeRepository.save(Employee.builder().name(messa));
+
+        kafkaProducer.sendMessage(message.toUpperCase(), "data-consumer-out");
         latch.countDown();
     }
 

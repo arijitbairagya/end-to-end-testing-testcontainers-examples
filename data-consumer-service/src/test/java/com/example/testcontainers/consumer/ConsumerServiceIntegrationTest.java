@@ -33,14 +33,14 @@ public class ConsumerServiceIntegrationTest extends AbstractIntegrationTest {
 
         dataConsumerContainer
                 .dependsOn(kafkaContainer, postgreSQLContainer)
-                .withNetwork(dockerNetwork)
+//                .withNetwork(dockerNetwork)
                 .withNetworkAliases("data-consumer-service")
                 .withEnv(
                         Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
                                 "DATABASE_USER", postgreSQLContainer.getUsername(),
                                 "DATABASE_PASSWORD", postgreSQLContainer.getPassword(),
                                 "BOOTSTRAP_SERVER", "host.docker.internal:"+ kafkaContainer.getFirstMappedPort()))
-                .withExposedPorts(8081)
+                .withExposedPorts(8080)
                 .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("ConsumerService"))
                 .waitingFor(Wait.forLogMessage(".*Started DataConsumerService.*\\n", 1))
                 .withReuse(false);

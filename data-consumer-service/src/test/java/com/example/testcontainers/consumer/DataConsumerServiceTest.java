@@ -1,10 +1,15 @@
 package com.example.testcontainers.consumer;
 
-import com.example.testcontainers.consumer.DataConsumerService;
 import com.example.testcontainers.consumer.config.kafka.KafkaProducer;
 import com.example.testcontainers.consumer.dao.EmployeeRepository;
 import com.example.testcontainers.consumer.dao.entity.Employee;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +21,12 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,10 +42,12 @@ class DataConsumerServiceTest {
 	@Autowired
 	KafkaProducer kafkaProducer;
 
+
+
 	/*************** Application context loading - END *****************/
 
 	/************** Test Containers Setup - START ***************/
-	private static Network network = Network.newNetwork();
+//	private static Network network = Network.newNetwork();
 
 	/**
 	 *
@@ -49,13 +60,13 @@ class DataConsumerServiceTest {
 			.withUsername("admin")
 			.withPassword("admin")
 			.withDatabaseName("poc_docker_container")
-			.withNetwork(network)
+//			.withNetwork(network)
 			.withNetworkAliases("postgres")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres"))
 			.withReuse(false); // reuse is used to keep the containers alive even after the test execution to
 
 	private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
-			.withNetwork(network)
+//			.withNetwork(network)
 			.withNetworkAliases("kafka")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka"))
 			.withReuse(false);
@@ -109,12 +120,41 @@ class DataConsumerServiceTest {
 	void testKafkaIntegration() {
 
 		Employee newEmp = Employee.builder()
-				.name("Arijit Bairagya ..via kafka")
+				.name("AbcDEf")
 				.build();
 
 		log.debug("Sending message to kafka..{} ", newEmp);
 
 		kafkaProducer.sendMessage(newEmp.toString(), "consumer-topic");
+
+		KafkaConsumer<String, String> kafkaConsumer = getConsumer(kafkaContainer);
+		kafkaConsumer.subscribe(Collections.singletonList("data-consumer-out"));
+//		Await
+		Awaitility.await().untilAsserted(() ->  {
+			ConsumerRecords<String, String> record = kafkaConsumer.poll(Duration.ofMillis(1000));
+			record.forEach( rec -> {
+				log.debug("Got record:: {}", rec.value());
+				Assert.assertEquals("ABCDEF", rec.value());
+			});
+
+		});
+
+
+	}
+
+	private KafkaConsumer<String, String> getConsumer(
+			KafkaContainer kafkaContainer) {
+
+		return new KafkaConsumer<>(
+				Map.of(
+						ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+						kafkaContainer.getBootstrapServers(),
+						ConsumerConfig.GROUP_ID_CONFIG,
+						"tc-" + "cosumer342849",
+						ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+						"earliest"),
+				new StringDeserializer(),
+				new StringDeserializer());
 	}
 
 }

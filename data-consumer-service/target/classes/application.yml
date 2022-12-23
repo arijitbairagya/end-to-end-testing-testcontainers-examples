@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password:  ${DATABASE_PASSWORD}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:62943/poc_docker_container?loggerLevel=OFF}
+    username: ${DATABASE_USER:admin}
+    password:  ${DATABASE_PASSWORD:admin}
   kafka:
     consumer:
-      bootstrap-servers: ${BOOTSTRAP_SERVER}
+      bootstrap-servers: ${BOOTSTRAP_SERVER:localhost:9092}
       group: "unique-group-123"
       topic: "consumer-topic"
       auto-offset-reset: earliest
@@ -13,7 +13,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
     producer:
-      bootstrap-servers: ${BOOTSTRAP_SERVER}
+      bootstrap-servers: ${BOOTSTRAP_SERVER:localhost:9092}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
