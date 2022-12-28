@@ -32,5 +32,5 @@ Go to project folder and build images using maven command - **mvn spring-boot:bu
 - Or Setup the $PATH environment variable
 PATH="$PATH:/Users/arijit/kafka_2.13-3.3.1/bin"
 3. publish message:: kafka-console-producer.sh --broker-list localhost:9092 --topic consumer-topic
-4. consumer message:: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic consumer-topic --from-beginning
+4. consume message:: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic consumer-topic --from-beginning
 
