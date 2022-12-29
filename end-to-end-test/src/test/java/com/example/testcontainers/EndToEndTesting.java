@@ -1,5 +1,6 @@
 package com.example.testcontainers;
 
+import com.example.testcontainers.config.model.Image;
 import com.example.testcontainers.containers.CustomKafkaContainer;
 import com.example.testcontainers.containers.CustomPostgreSQLContainer;
 import com.example.testcontainers.containers.DataConsumerServiceContainer;
@@ -8,33 +9,41 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
 @Slf4j
+@ContextConfiguration(classes = Application.class)
 @SpringBootTest(classes = EndToEndTesting.class)
 @ActiveProfiles("end2end")
+@ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(value = TestContext.class)
-//@TestPropertySource("classpath:application-end2end.yml")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EndToEndTesting {
 
-//    @Autowired
-//    TestContext testContext;
 
-    @Value("${postgresImage}")
-    public String postgresImage;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTesting.class);
+
+    @Autowired
+    private PipelineimagesProperties pipelineImagesProperties;
 
     public String dataConsumerImage = "data-consumer-service:0.0.1-SNAPSHOT";
 
@@ -97,5 +106,26 @@ public class EndToEndTesting {
         log.debug("nothing 2222>>>>> {} ", postgreSQLContainer.getJdbcUrl());
     }
 
+
+    @Test
+    public void yamlLoadDemo() {
+        LOGGER.info("Start of the demo test");
+        if (ObjectUtils.isNotEmpty(pipelineImagesProperties) && ObjectUtils.isNotEmpty(pipelineImagesProperties.getImages())) {
+            for (Image image : pipelineImagesProperties.getImages()
+            ) {
+                if ("popstgers-sql".equalsIgnoreCase(image.getName())) {
+
+                    for (String applicationPropFileName : image.getApplicationProperty()) {
+                         //override the application properties to the container which is instantiated
+                        System.out.println("Load Postgresql Image name >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + image.getName());
+                        System.out.println("Load Postgresql APP prop Names  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + image.getApplicationProperty().get(0));
+                        System.out.println("Load Postgresql APP prop Names  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + image.getApplicationProperty().get(1));
+
+                    }
+                }
+            }
+
+        }
+    }
 
 }

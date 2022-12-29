@@ -1,4 +1,0 @@
-spring:
-  kafka:
-    consumer:
-      topic: "consumer-test-topic"

@@ -1,11 +1,12 @@
-testContext:
-  systemUnderTest:
-    pipelineImages:
-      -
-        imageName:
-        applicationProperty: app-source-adtp.yml
-      -
-        imageName:
-        applicationProperty: app-consumer-adtp.yml
+---
+pipelineimages:
+  images:
+    - name: popstgers-sql
+      applicationProperty:
+        - application_postgresql.yml
+        - application_sql.yml
+      environmentProperty: environment_postgresql.yml
+    - name: kafka
+      applicationProperty: application_kafka.yml
+      environmentProperty: environment_kafka.yml
 
-postgresImage: postgres
