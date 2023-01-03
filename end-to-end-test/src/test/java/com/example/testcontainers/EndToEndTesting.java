@@ -47,9 +47,6 @@ public class EndToEndTesting {
 
     public String dataConsumerImage = "data-consumer-service:0.0.1-SNAPSHOT";
 
-    public String dataPersistenceImage = "";
-
-    public String dataPublisherServiceImage = "";
 
     private Network end2endNetwork = Network.newNetwork();
 
@@ -111,8 +108,9 @@ public class EndToEndTesting {
     public void yamlLoadDemo() {
         LOGGER.info("Start of the demo test");
         if (ObjectUtils.isNotEmpty(pipelineImagesProperties) && ObjectUtils.isNotEmpty(pipelineImagesProperties.getImages())) {
-            for (Image image : pipelineImagesProperties.getImages()
-            ) {
+            System.out.println("LOAD TEST 00 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + pipelineImagesProperties.getImages());
+            for (Image image : pipelineImagesProperties.getImages()) {
+                System.out.println("LOAD TEST >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + image.getName());
                 if ("popstgers-sql".equalsIgnoreCase(image.getName())) {
 
                     for (String applicationPropFileName : image.getApplicationProperty()) {

@@ -27,7 +27,7 @@ public class PocTest {
 
     @Test
     public void test1() {
-        log.debug("Nothing...{}", testContext.getSystemUnderTest().getPipelineImages());
+        log.debug("Nothing...{}");
     }
 
 

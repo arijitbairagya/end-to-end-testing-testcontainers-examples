@@ -1,5 +1,6 @@
 package com.example.testcontainers.consumer;
 
+import com.example.testcontainers.consumer.model.Image;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -10,16 +11,23 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 
@@ -31,37 +39,47 @@ import java.util.Map;
 
 @Slf4j
 @SpringBootTest(classes = ConsumerServiceDynamicPropertyLoadingIntegrationTest.class)
-@ActiveProfiles("integration-test")
+@ActiveProfiles("integration")
+@ExtendWith(SpringExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ContextConfiguration(classes = {PipelineimagesProperties.class})
+@EnableConfigurationProperties
 public class ConsumerServiceDynamicPropertyLoadingIntegrationTest extends AbstractIntegrationTest {
 
 
-    // load application using generic docker container
-    private static GenericContainer dataConsumerContainer = new GenericContainer(DockerImageName.parse("data-consumer-service:0.0.1-SNAPSHOT"));
+    @Autowired
+    private PipelineimagesProperties pipelineImagesProperties;
 
     @BeforeAll
-    public static void  setupContainers() {
+    public void setupContainers() {
         // call
         initContainers();
 
-        dataConsumerContainer
-                .dependsOn(kafkaContainer, postgreSQLContainer)
-                .withNetwork(dockerNetwork)
-                .withNetworkAliases("data-consumer-service")
-                .withEnv(
-                        Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
-                                "DATABASE_USER", postgreSQLContainer.getUsername(),
-                                "DATABASE_PASSWORD", postgreSQLContainer.getPassword(),
-                                "BOOTSTRAP_SERVER", "host.docker.internal:"+kafkaContainer.getFirstMappedPort()))
-                .withExposedPorts(8080)
-                .withFileSystemBind(Paths.get("src/test/resources/application-integration-test.yml").toAbsolutePath().toString(),
-                        "/application.yml", BindMode.READ_ONLY)
-                .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("ConsumerService"))
-                .waitingFor(Wait.forLogMessage(".*Started DataConsumerService.*\\n", 1))
-                .withReuse(false);
+        if (ObjectUtils.isNotEmpty(pipelineImagesProperties) && ObjectUtils.isNotEmpty(pipelineImagesProperties.getImages())) {
+            for (Image image : pipelineImagesProperties.getImages()) {
+                log.debug("Image Name read from YAML file >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + image.getName());
+                GenericContainer dataConsumerContainer = new GenericContainer(DockerImageName.parse(image.getName()));
+                dataConsumerContainer
+                        .dependsOn(kafkaContainer, postgreSQLContainer)
+                        .withNetwork(dockerNetwork)
+                        .withNetworkAliases("data-consumer-service")
+                        .withEnv(
+                                Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
+                                        "DATABASE_USER", postgreSQLContainer.getUsername(),
+                                        "DATABASE_PASSWORD", postgreSQLContainer.getPassword(),
+                                        "BOOTSTRAP_SERVER", "host.docker.internal:"+kafkaContainer.getFirstMappedPort()))
+                        .withExposedPorts(8080)
+                        .withFileSystemBind(Paths.get("src/test/resources/application-integration-test.yml").toAbsolutePath().toString(),
+                                "/application.yml", BindMode.READ_ONLY)
+                        .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("ConsumerService"))
+                        .waitingFor(Wait.forLogMessage(".*Started DataConsumerService.*\\n", 1))
+                        .withReuse(false);
+                // start SUT generic container
+                log.debug("Starting data consumer service container..");
+                dataConsumerContainer.start();
+            }
+        }
 
-        // start SUT generic container
-        log.debug("Starting data consumer service container..");
-        dataConsumerContainer.start();
     }
 
     @Test
@@ -115,6 +133,6 @@ public class ConsumerServiceDynamicPropertyLoadingIntegrationTest extends Abstra
 
     @Test
     void testRestEndpoint() {
-        log.debug("Test Rest API Call ..");
+        log.debug("Test Rest API Call .."+pipelineImagesProperties);
     }
 }
