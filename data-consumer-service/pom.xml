@@ -13,15 +13,6 @@
     <artifactId>data-consumer-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>data-consumer-service</name>
-
-        <properties>
-            <maven.compiler.source>17</maven.compiler.source>
-            <maven.compiler.target>17</maven.compiler.target>
-            <java.version>17</java.version>
-            <testcontainers.version>1.17.6</testcontainers.version>
-            <dockerfile-maven-version>1.4.13</dockerfile-maven-version>
-        </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

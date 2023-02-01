@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.example.testcontainers.consumer.ConsumerServiceIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.007 s <<< FAILURE! - in com.example.testcontainers.consumer.ConsumerServiceIntegrationTest
+com.example.testcontainers.consumer.ConsumerServiceIntegrationTest  Time elapsed: 0.007 s  <<< ERROR!
+java.util.concurrent.CompletionException: java.lang.IllegalStateException: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+Caused by: java.lang.IllegalStateException: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+

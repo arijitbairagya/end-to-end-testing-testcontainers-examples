@@ -10,15 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>end-to-end-test</artifactId>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <java.version>17</java.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
-        <dockerfile-maven-version>1.4.13</dockerfile-maven-version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

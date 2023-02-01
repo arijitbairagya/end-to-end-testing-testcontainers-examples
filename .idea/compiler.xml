@@ -11,7 +11,6 @@
         <module name="data-persistence-service" />
         <module name="end-to-end-test" />
         <module name="data-publisher-service" />
-        <module name="poc-test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -19,6 +18,7 @@
       <module name="data-persistance" target="17" />
       <module name="data-persistence" target="17" />
       <module name="data-publisher" target="17" />
+      <module name="poc-test" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
