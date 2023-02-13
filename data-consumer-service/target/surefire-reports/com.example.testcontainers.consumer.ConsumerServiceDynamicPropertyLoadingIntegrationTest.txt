@@ -1,8 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.example.testcontainers.consumer.ConsumerServiceDynamicPropertyLoadingIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.708 s <<< FAILURE! - in com.example.testcontainers.consumer.ConsumerServiceDynamicPropertyLoadingIntegrationTest
-com.example.testcontainers.consumer.ConsumerServiceDynamicPropertyLoadingIntegrationTest  Time elapsed: 0.706 s  <<< ERROR!
-java.util.concurrent.CompletionException: java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
-Caused by: java.lang.IllegalStateException: Could not find a valid Docker environment. Please see logs and check configuration
-

@@ -1,6 +1,32 @@
+# Microservices Testing Strategies
+In microservice architectural style, services are connected with each other over networks and make use of external data stores. These network
+partitions affects the style of testing. In a large system multiple services work together to meet business functionalities and multiple teams are
+responsible to maintain those services. In some cases asynchronous publish-subscribe communication mechanism is more useful
+than synchronous point-to-point communication. Automated test should provide the coverage for each of these services to identify the failure points and help to 
+build resilient system. 
+
+### Different Approaches for microservice testing 
+* ### **Unit Testing**  
+    In this testing approach we normally test smallest unit of code which are written at class level or considering group of relates classes. 
+* ### **Integration Testing**
+  In microservice architecture these are used to verify interactions between layers of integration code and external components with which the services are interacting. 
+* ### **End-To-End Testing(E2E)**
+  An end-to-end test verifies that a system meets external requirements and achieve its goal by testing the entire system end to end. To achieve this the system under test is considered as black box and manipulate this through public interfaces. 
+
+Here we are going to concentrate mainly E2E testing approach and how this can be integrated with CI pipeline to perform the automation testing. 
+
+One of the most popular approach today to perform microservices E2E test is to set up a separate test environment and run containerized applications to perform the test. This approach is having multiple problems 
+
+- We still need to use the network services, for example data stores, kafka etc which are required to be in a clean state or desired state before the execution of E2E test
+- Any data manipulation by one team can affect the test execution of another team which leads to stringent test data management
+- As different teams want to run their own services which is under development, it will become a costly affair to run multiple test instances with the required services
+
+Let's consider the following example  
+
+![data-flow-diagram.jpg](..%2Fdata-flow-diagram.jpg)
 
 
-# TestContainers End To End Microservice Testing 
+# End-To-End Testing Using TestContainers Framework
 
 This project is an example of how to test microservices separately using docker and test containers(https://www.testcontainers.org/)
 
@@ -11,7 +37,7 @@ Following picture illustrate the functionality for the microservices -
 # Build Docker Images
 Go to project folder and build images using maven command - **mvn spring-boot:build-image**
 
-# Run End To End Test
+# Run End-To-End Test
 
 
 # Additional notes

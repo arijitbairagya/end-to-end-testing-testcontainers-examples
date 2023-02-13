@@ -65,7 +65,7 @@ class DataConsumerServiceTest {
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres"))
 			.withReuse(false); // reuse is used to keep the containers alive even after the test execution to
 
-	private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
+	private static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
 //			.withNetwork(network)
 			.withNetworkAliases("kafka")
 			.withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka"))
