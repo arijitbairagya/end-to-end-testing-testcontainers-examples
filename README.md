@@ -21,9 +21,12 @@ One of the most popular approach today to perform microservices E2E test is to s
 - Any data manipulation by one team can affect the test execution of another team which leads to stringent test data management
 - As different teams want to run their own services which is under development, it will become a costly affair to run multiple test instances with the required services
 
-Let's consider the following example  
+Let's consider the following example
 
-![data-flow-diagram.jpg](..%2Fdata-flow-diagram.jpg)
+
+![data-flow-diagram](https://user-images.githubusercontent.com/17141306/218394885-84cb8e5a-eacc-4ad3-a638-de99040f5607.jpg)
+
+
 
 
 # End-To-End Testing Using TestContainers Framework
