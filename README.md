@@ -42,13 +42,20 @@ We can resolve the problem of E2E testing using the Testcontainers. As per the o
 
 ### Key Benefits
 * Instead of in-memory database(H2) for DAO unit tests we can run real DB using a container to get the benefit of 100% database compatibility. In our case we can run the _PostgreSQL_ using postgres docker image and initialize the state according to out Test needs 
+* As we can see on the data producer side, Kafka topic or sftp path are shared across organization and if we have to simulate the **data-consumer** service for E2E test we need publish test data to **consumer.in** topic which is not desired as other subscribers can use the same topic for their integration. We can avoid the same by using Kafka test containers.  
+* As the external services dependencies are embedded with the test case itself, we can get faster feedback for e2e integration tests
+* Parallel execution is easy now using isolated instances of containers 
+* We can clearly define microservices version with which we want to perform E2E tests and simulate production like environment in a short-lived containerized environment 
 
-# End-To-End Testing Using TestContainers Framework
+Note: Testcontainers requires a Docker-API compatible container runtime. 
+
+### End-To-End Microservice Testing Using TestContainers Framework
 
 This project is an example of how to test microservices separately using docker and test containers(https://www.testcontainers.org/)
 
-Following picture illustrate the functionality for the microservices - 
-![End2End-Microservice-Testing-Architecture v1 0](https://user-images.githubusercontent.com/17141306/208586936-9647aaf3-a196-4471-a4fc-db73270bb61b.jpg)
+#### Prerequisites
+* Docker
+* A supported JVM testing framework ( Jupiter/JUnit 5)
 
 
 # Build Docker Images
