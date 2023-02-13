@@ -26,8 +26,22 @@ Let's consider the following example
 
 ![data-flow-diagram](https://user-images.githubusercontent.com/17141306/218394885-84cb8e5a-eacc-4ad3-a638-de99040f5607.jpg)
 
+Here we have 4 microservice which are working together to produce the end result. These services are communicating with each other in asynchronous way by subscribing & publishing through kafka topics
 
+- **data-consumer** service which can consumer data from different type of data producers in different format and using different network protocols(HTTP/SFTP/TCP)
+- **data-transformer** service is listening to the output of **data-consumer** service and transform the data applying some business logic
+- **data-access & data-publisher** services are subscribed to the output topic of data-transformer which eventually persist the data and publish to desired format
 
+Considering the event-driven and asynchronous integration pattern of the microservices, this is very hard to perform E2E test without the services being deployed to some test environment and connected to the network services.
+
+### [Testcontainers](https://www.testcontainers.org/)
+
+We can resolve the problem of E2E testing using the Testcontainers. As per the official definition 
+
+"_Testcontainers for Java is a Java library that supports JUnit tests, providing lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container._"
+
+### Key Benefits
+* Instead of in-memory database(H2) for DAO unit tests we can run real DB using a container to get the benefit of 100% database compatibility. In our case we can run the _PostgreSQL_ using postgres docker image and initialize the state according to out Test needs 
 
 # End-To-End Testing Using TestContainers Framework
 
