@@ -88,16 +88,36 @@ This project is an example of how to test microservices separately using docker 
 * A supported JVM testing framework ( Jupiter/JUnit 5)
 
 
-### Build Docker Images
-Go to project folder and build images using maven command - **mvn spring-boot:build-image**
-
 ### Run End-To-End Test
+Checkout the project and run the command  $ **mvn clean install**
 
+This will build all the images for the microservices and install locally. 
+
+### Implementing End-To-End test
+
+
+
+    /**
+     *
+     * static kafka container is declared as this is required to have a single kafka setup for all the test cases.
+     * 	If static is not used then each test method will get a new kafka instance
+     * 	with re-use it will keep the container which is good for local development
+     *
+     */
+    public static KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
+            .withNetwork(dockerNetwork)
+            .withAccessToHost(true)
+            .withNetworkAliases("kafka")
+            .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka-Test-Container"))
+            .withExposedPorts(9092, 9093)
+            .withReuse(false);
 
 
 #### Additional notes
 
 - Kafka Installation for Mac
+
+If you want to test the application with actual kafka server locally
 
 1. Download the latest version of Apache Kafka from https://kafka.apache.org/downloads under Binary downloads.
 

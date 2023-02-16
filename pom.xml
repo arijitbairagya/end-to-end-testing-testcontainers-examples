@@ -29,6 +29,7 @@
         <module>data-persistence-service</module>
         <module>data-publisher-service</module>
         <module>end-to-end-test</module>
+        <module>data-transformer-service</module>
     </modules>
 
 
