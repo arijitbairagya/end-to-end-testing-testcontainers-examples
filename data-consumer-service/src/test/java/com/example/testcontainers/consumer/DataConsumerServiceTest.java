@@ -42,13 +42,6 @@ class DataConsumerServiceTest {
 	@Autowired
 	KafkaProducer kafkaProducer;
 
-
-
-	/*************** Application context loading - END *****************/
-
-	/************** Test Containers Setup - START ***************/
-//	private static Network network = Network.newNetwork();
-
 	/**
 	 *
 	 * static sql container is declared as this is required to have a single database instance for all the test cases.

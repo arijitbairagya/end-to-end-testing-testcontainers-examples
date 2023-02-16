@@ -29,7 +29,7 @@ public class CustomPostgreSQLContainer extends PostgreSQLContainer {
         return postgreSQLContainer;
     }
 
-    public static void initialize(Network network) {
+    public void initialize(Network network) {
         log.debug("initPostgresContainer..." );
         postgreSQLContainer.withUsername("super-admin")
                 .withPassword("super-admin")

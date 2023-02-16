@@ -62,6 +62,13 @@ We can resolve the problem of E2E testing using the Testcontainers. As per the o
 
 "_Testcontainers for Java is a Java library that supports JUnit tests, providing lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container._"
 
+There are a lot of predefined ready to use modules available from testcontainers which includes - 
+- Kafka
+- PostgreSQL( Other database modules such as MongoDB, MySQL module, Cassandra etc)
+- Azure, GCloud 
+
+If the predefined test contains are not available yet, we can create test containers from Generic Containers, provided the docker image is available.
+
 #### Key Benefits
 * Instead of in-memory database(H2) for DAO unit tests we can run real DB using a container to get the benefit of 100% database compatibility. In our case we can run the _PostgreSQL_ using postgres docker image and initialize the state according to out Test needs 
 * As we can see on the data producer side, Kafka topic or sftp path are shared across organization and if we have to simulate the **data-consumer** service for E2E test we need publish test data to **consumer.in** topic which is not desired as other subscribers can use the same topic for their integration. We can avoid the same by using Kafka test containers.  
@@ -73,20 +80,22 @@ Note: Testcontainers requires a Docker-API compatible container runtime.
 
 ### End-To-End Microservice Testing Using TestContainers Framework
 
-This project is an example of how to test microservices separately using docker and test containers(https://www.testcontainers.org/)
+This project is an example of how to test microservices separately using docker and test containers.
+
 
 #### Prerequisites
 * Docker
 * A supported JVM testing framework ( Jupiter/JUnit 5)
 
 
-# Build Docker Images
+### Build Docker Images
 Go to project folder and build images using maven command - **mvn spring-boot:build-image**
 
-# Run End-To-End Test
+### Run End-To-End Test
 
 
-# Additional notes
+
+#### Additional notes
 
 - Kafka Installation for Mac
 

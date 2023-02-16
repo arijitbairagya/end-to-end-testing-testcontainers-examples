@@ -35,7 +35,6 @@ public class CustomKafkaContainer extends KafkaContainer {
 
     @Override
     public void start() {
-        log.debug("Setting system property kafka BOOTSTRAP_SERVER ::{}", kafkaContainer.getBootstrapServers());
         super.start();
         System.setProperty("BOOTSTRAP_SERVER", kafkaContainer.getBootstrapServers());
     }
