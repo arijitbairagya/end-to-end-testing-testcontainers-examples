@@ -95,6 +95,45 @@ This will build all the images for the microservices and install locally.
 
 ### Implementing End-To-End test
 
+This project have the following modules - 
+
+    <modules>
+        <module>data-consumer-service</module>
+        <module>data-persistence-service</module>
+        <module>data-publisher-service</module>
+        <module>end-to-end-test</module>
+        <module>data-transformer-service</module>
+    </modules>
+
+Maven Dependencies which are required to run the end-to-end test- 
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+We can initialize the network services which are required to run the microservices. In this example we are using Kafka and PostgreSQL 
+
+In class 
+
+@Slf4j
+public class AbstractIntegrationTest - we defined the same
 
 
     /**
@@ -111,6 +150,81 @@ This will build all the images for the microservices and install locally.
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Kafka-Test-Container"))
             .withExposedPorts(9092, 9093)
             .withReuse(false);
+
+
+
+    /**
+     *
+     * static sql container is declared as this is required to have a single database instance for all the test cases.
+     * 	If static is not used then each test method will get a new database instance
+     * 	with re-use it will keep the container which is good for local development
+     *
+     */
+    public static PostgreSQLContainer postgreSQLContainer = (PostgreSQLContainer)
+            new PostgreSQLContainer(PostgreSQLContainer.IMAGE)
+            .withUsername("admin")
+            .withPassword("admin")
+            .withDatabaseName("poc_docker_container")
+            .withNetwork(dockerNetwork)
+            .withNetworkAliases("postgres")
+            .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("Postgres-Test-Container"))
+            .withReuse(false); // reuse is used to keep the containers alive even after the test execution to
+
+In the class 
+
+public class ConsumerServiceIntegrationTest extends AbstractIntegrationTest {
+
+we started the network services and the microservices which required to run the test and dynamically override the spring application properties by seting the environment variables - 
+
+    @BeforeAll
+    public static void  setupContainers() {
+        // call
+        initContainers();
+
+        dataConsumerContainer
+                .dependsOn(kafkaContainer, postgreSQLContainer)
+                .withNetwork(dockerNetwork)
+                .withNetworkAliases("data-consumer-service")
+                .withEnv(
+                        Map.of("DATABASE_URL" ,  "jdbc:postgresql://host.docker.internal:" + postgreSQLContainer.getMappedPort(5432)+ "/"+ postgreSQLContainer.getDatabaseName(),
+                                "DATABASE_USER", postgreSQLContainer.getUsername(),
+                                "DATABASE_PASSWORD", postgreSQLContainer.getPassword(),
+                                "BOOTSTRAP_SERVER", "host.docker.internal:"+kafkaContainer.getFirstMappedPort()))
+                .withExposedPorts(8080)
+                .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("ConsumerService"))
+                .waitingFor(Wait.forLogMessage(".*Started DataConsumerService.*\\n", 1))
+                .withReuse(false);
+
+        // start SUT generic container
+        log.debug("Starting data consumer service container..");
+        dataConsumerContainer.start();
+    }
+
+Once all the required containers are started we can execute the E2E test by calling the following test case - 
+
+    @Test
+    public void testKafkaIntegration() {
+        log.debug("Kafka address:{}", kafkaContainer.getBootstrapServers());
+
+        KafkaTemplate kafkaTemplate = getKafkaTemplate(kafkaContainer);
+
+        String message = "Arijit";
+        kafkaTemplate.send("consumer-topic", message);
+
+        KafkaConsumer<String, String> kafkaConsumer = getConsumer(kafkaContainer);
+        kafkaConsumer.subscribe(Collections.singletonList("data-consumer-out"));
+
+        Awaitility.await().untilAsserted(() ->  {
+            ConsumerRecords<String, String> record = kafkaConsumer.poll(Duration.ofMillis(1000));
+            record.forEach( rec -> {
+                log.debug("Got processed : {} for input message:: {}", message, rec.value());
+                Assert.assertEquals("ARIJIT", rec.value());
+            });
+        });
+    }
+
+
+
 
 
 #### Additional notes

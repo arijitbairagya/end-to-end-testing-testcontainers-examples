@@ -11,6 +11,7 @@
         <module name="data-persistence-service" />
         <module name="end-to-end-test" />
         <module name="data-publisher-service" />
+        <module name="data-transformer-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -26,6 +27,7 @@
       <module name="data-consumer-service" options="-parameters" />
       <module name="data-persistence-service" options="-parameters" />
       <module name="data-publisher-service" options="-parameters" />
+      <module name="data-transformer-service" options="-parameters" />
       <module name="end-to-end-test" options="-parameters" />
       <module name="poc-test" options="-parameters" />
     </option>
