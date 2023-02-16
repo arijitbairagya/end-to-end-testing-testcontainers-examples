@@ -223,7 +223,19 @@ Once all the required containers are started we can execute the E2E test by call
         });
     }
 
+On another note, we can enhance the integration test of each microservice by utilizing the testcontainers. For example, in the data-consumer-service module 
 
+class DataConsumerServiceIntegrationTest we are dynamically overriding the spring application properties with test container property. Instead of using embedded kafka or in-memory H2 database we can replace the same with Testcontainers to perform integration 
+tests similar like production environment or close to production environment. 
+
+	@DynamicPropertySource
+	public static void overrideProperty(DynamicPropertyRegistry dynamicPropertyRegistry) {
+		dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+		dynamicPropertyRegistry.add("spring.datasource.user", postgreSQLContainer::getUsername);
+		dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+
+		dynamicPropertyRegistry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
+	}
 
 
 
