@@ -1,32 +1,24 @@
 # Microservices Testing Strategies
+
 In microservice architectural style, services are connected with each other over networks and make use of external data stores. These network
 partitions affects the style of testing. In a large system multiple services work together to meet business functionalities and multiple teams are
 responsible to maintain those services. In some cases asynchronous publish-subscribe communication mechanism is more useful
-than synchronous point-to-point communication. Automated test should provide the coverage for each of these services to identify the failure points and help to 
-build resilient system. 
+than synchronous point-to-point communication. <br> 
+Automated test should provide the coverage for each of these services to identify the failure points and help to 
+build resilient system. With <b>continuous delivery </b> we can use a build pipeline to automatically test our application and deploy to test or production environment.
 
-### Different Approaches for microservice testing 
-* ### **Unit Testing**  
-    In this testing approach we normally test smallest unit of code which are written at class level or considering group of relates classes. 
-* ### **Integration Testing**
-  In microservice architecture these are used to verify interactions between layers of integration code and external components with which the services are interacting. 
-* ### **End-To-End Testing(E2E)**
-  An end-to-end test verifies that a system meets external requirements and achieve its goal by testing the entire system end to end. To achieve this the system under test is considered as black box and manipulate this through public interfaces. 
+### Technical Stack
+- Spring Boot
+- Docker
+- [Testcontainers](https://www.testcontainers.org/)
+- JUnit
 
-Here we are going to concentrate mainly E2E testing approach and how this can be integrated with CI pipeline to perform the automation testing. 
-
-One of the most popular approach today to perform microservices E2E test is to set up a separate test environment and run containerized applications to perform the test. This approach is having multiple problems 
-
-- We still need to use the network services, for example data stores, kafka etc which are required to be in a clean state or desired state before the execution of E2E test
-- Any data manipulation by one team can affect the test execution of another team which leads to stringent test data management
-- As different teams want to run their own services which is under development, it will become a costly affair to run multiple test instances with the required services
-
+### Example Application
 Let's consider the following example
 
+![E2E-Diagrams-e2e-components.jpg](E2E-Diagrams-e2e-components.jpg)
 
-![data-flow-diagram](https://user-images.githubusercontent.com/17141306/218394885-84cb8e5a-eacc-4ad3-a638-de99040f5607.jpg)
-
-Here we have 4 microservice which are working together to produce the end result. These services are communicating with each other in asynchronous way by subscribing & publishing through kafka topics
+Here we have 4 microservices which are working together to produce the end result. These services are communicating with each other in asynchronous way by subscribing & publishing through kafka topics and additionally it can persist the data to database and expose the same as and when required.
 
 - **data-consumer** service which can consumer data from different type of data producers in different format and using different network protocols(HTTP/SFTP/TCP)
 - **data-transformer** service is listening to the output of **data-consumer** service and transform the data applying some business logic
@@ -34,13 +26,43 @@ Here we have 4 microservice which are working together to produce the end result
 
 Considering the event-driven and asynchronous integration pattern of the microservices, this is very hard to perform E2E test without the services being deployed to some test environment and connected to the network services.
 
+### Different Approaches for microservice testing - Test Pyramid
+
+As per Martin fowler practical [Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
+
+![E2E-Diagrams-Test-Pyramid.jpg](E2E-Diagrams-Test-Pyramid.jpg)
+
+* ### **Unit Testing**  
+    In this testing approach we normally test smallest unit of code which are written at class level or considering group of relates classes which are public.
+A unit test replaces the external collaboration with test doubles(Mocking & Stubbing).
+<br> In this example we can mock the external services by mocking the external services(kafka, postgres) and asserting the expected output of those services. 
+![E2E-Diagrams-Unit-Test.jpg](E2E-Diagrams-Unit-Test.jpg)
+
+* ### **Integration Testing**
+  In microservice architecture these are used to verify interactions between layers of integration code and external components with which the services are interacting.
+<br> In our example we can use embedded kafka or H2 in-memory database so that our services can connect those services.
+![E2E-Diagrams-Integration-Test.jpg](E2E-Diagrams-Integration-Test.jpg)
+* ### **End-To-End Testing(E2E)**
+  An end-to-end test verifies that a system meets external requirements and achieve its goal by testing the entire system end to end. To achieve this the system under test is considered as black box and manipulate this through public interfaces.
+
+![E2E-Diagrams-e2e-test.jpg](E2E-Diagrams-e2e-test.jpg)
+Here we are going to concentrate mainly E2E testing approach and how this can be integrated with CI pipeline to perform the automation testing. We
+still need to follow the test pyramid and write test cases for different level. 
+
+One of the most popular approach today to perform microservices E2E test is to set up a separate test environment and run containerized applications to perform the test. This approach is having multiple problems
+
+- We still need to use the network services, for example data stores, kafka etc which are required to be in a clean state or desired state before the execution of E2E test
+- Any data manipulation by one team can affect the test execution of another team which leads to stringent test data management
+- As different teams want to run their own services which is under development, it will become a costly affair to run multiple test instances with the required services
+
+
 ### [Testcontainers](https://www.testcontainers.org/)
 
 We can resolve the problem of E2E testing using the Testcontainers. As per the official definition 
 
 "_Testcontainers for Java is a Java library that supports JUnit tests, providing lightweight, throwaway instances of common databases, Selenium web browsers, or anything else that can run in a Docker container._"
 
-### Key Benefits
+#### Key Benefits
 * Instead of in-memory database(H2) for DAO unit tests we can run real DB using a container to get the benefit of 100% database compatibility. In our case we can run the _PostgreSQL_ using postgres docker image and initialize the state according to out Test needs 
 * As we can see on the data producer side, Kafka topic or sftp path are shared across organization and if we have to simulate the **data-consumer** service for E2E test we need publish test data to **consumer.in** topic which is not desired as other subscribers can use the same topic for their integration. We can avoid the same by using Kafka test containers.  
 * As the external services dependencies are embedded with the test case itself, we can get faster feedback for e2e integration tests
